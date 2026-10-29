@@ -10,7 +10,7 @@ All ``pyzeebe`` errors inherit from :py:class:`PyZeebeError`
 
 .. autoexception:: pyzeebe.errors.NoVariableNameGivenError
 
-.. autoexception:: pyzeebe.errors.NoZeebeAdapterError
+.. autoexception:: pyzeebe.errors.SettingsError
 
 .. autoexception:: pyzeebe.errors.DuplicateTaskTypeError
 
@@ -32,7 +32,11 @@ All ``pyzeebe`` errors inherit from :py:class:`PyZeebeError`
 
 .. autoexception:: pyzeebe.errors.ProcessInvalidError
 
+.. autoexception:: pyzeebe.errors.DecisionNotFoundError
+
 .. autoexception:: pyzeebe.errors.InvalidJSONError
+
+.. autoexception:: pyzeebe.errors.ZeebeError
 
 .. autoexception:: pyzeebe.errors.ZeebeBackPressureError
 
@@ -40,6 +44,15 @@ All ``pyzeebe`` errors inherit from :py:class:`PyZeebeError`
 
 .. autoexception:: pyzeebe.errors.ZeebeInternalError
 
+.. autoexception:: pyzeebe.errors.ZeebeDeadlineExceeded
+
 .. autoexception:: pyzeebe.errors.InvalidOAuthCredentialsError
 
-.. autoexception:: pyzeebe.errors.InvalidCamundaCloudCredentialsError
+.. autoexception:: pyzeebe.errors.UnknownGrpcStatusCodeError
+
+
+=================
+Exception Handler
+=================
+
+.. autofunction:: pyzeebe.default_exception_handler

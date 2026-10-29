@@ -21,17 +21,17 @@ Run using event loop
     async def my_task(x: int):
         return {"y": x + 1}
 
-    loop = asyncio.get_running_loop()
+    loop = asyncio.get_event_loop()
     loop.run_until_complete(worker.work())
 
 .. warning::
 
-   Calling ``worker.work`` directly using ``asyncio.run`` will not work. When you create an async grpc channel a new event loop will automatically be created, which causes problems when running the worker (see: https://github.com/camunda-community-hub/pyzeebe/issues/198).
-   
-   An easy workaround:
+    Calling ``worker.work`` directly using ``asyncio.run`` will not work. When you create an async grpc channel a new event loop will automatically be created, which causes problems when running the worker (see: https://github.com/camunda-community-hub/pyzeebe/issues/198).
+
+    An easy workaround:
 
     .. code-block:: python
-    
+
         async def main():
             channel = create_insecure_channel()
             worker = ZeebeWorker(channel)
@@ -56,6 +56,10 @@ This means the worker will disconnect upon two consecutive failures. Each time t
 .. note::
 
     The default behavior is 10 retries. If you want infinite retries just set to -1.
+
+..note ::
+
+    After the number of retries you set, the grpc channel closes and the ZeebeWorker stop.
 
 
 Add a task
@@ -86,4 +90,3 @@ To stop a running worker:
     # Trigger this on some event (SIGTERM for example)
     async def shutdown():
         await worker.stop()
-

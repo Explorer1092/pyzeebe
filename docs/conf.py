@@ -6,6 +6,8 @@
 
 # -- Path setup --------------------------------------------------------------
 
+import importlib.metadata
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -15,18 +17,18 @@ import sys
 
 import sphinx_rtd_theme
 
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath(".."))
 
 # -- Project information -----------------------------------------------------
 
 sphinx_rtd_theme  # So optimize imports doens't erase it
 
-project = 'pyzeebe'
-copyright = '2020, Jonatan Martens'
-author = 'Jonatan Martens'
+project = "pyzeebe"
+copyright = "2020, Jonatan Martens"
+author = "Jonatan Martens"
 
 # The full version, including alpha/beta/rc tags
-release = '3.0.0'
+release = importlib.metadata.version(project)
 
 # -- General configuration ---------------------------------------------------
 
@@ -37,11 +39,12 @@ extensions = [
     "sphinx_rtd_theme",
     "sphinx.ext.autodoc",
     "sphinx.ext.napoleon",
-    "sphinx.ext.autosectionlabel"
+    "sphinx.ext.autosectionlabel",
+    "sphinx.ext.intersphinx",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -58,8 +61,16 @@ html_theme = "sphinx_rtd_theme"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
-version = "3.0.0"
+version = importlib.metadata.version(project)
 
-master_doc = 'index'
+master_doc = "index"
+
+# Looks for objects in external projects
+intersphinx_mapping = {
+    "grpc": ("https://grpc.github.io/grpc/python/", None),
+    "requests": ("https://requests.readthedocs.io/en/latest/", None),
+    "requests_oauthlib": ("https://requests-oauthlib.readthedocs.io/en/latest/", None),
+    "python": ("https://docs.python.org/3/", None),
+}

@@ -48,8 +48,7 @@ Creating a client
 Dependencies
 ============
 
-* python 3.6+
-* zeebe-grpc
+* python 3.10+
 * grpcio
 * protobuf
 * oauthlib
@@ -66,3 +65,4 @@ Table Of Contents
     Channels <channels>
     Decorators <decorators>
     Exceptions <errors>
+    Zeebe Adapter <zeebe_adapter>

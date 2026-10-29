@@ -26,12 +26,12 @@ This is a task that does nothing. It receives no parameters and also doesn't ret
 Async/Sync Tasks
 ----------------
 
-Tasks can be regular or async functions. If given a regular function, pyzeebe will convert it into an async one by running `asyncio.run_in_executor`
+Tasks can be regular or async functions. If given a regular function, pyzeebe will convert it into an async one by running :py:meth:`asyncio.loop.run_in_executor`
 
 .. note::
 
     Make sure not to call any blocking function in an async task. This would slow the entire worker down.
-    
+
     Do:
 
     .. code-block:: python
@@ -57,9 +57,10 @@ An exception handler's signature:
 
 .. code-block:: python
 
-    Callable[[Exception, Job], Awaitable[None]]
+    Callable[[Exception, Job, JobController], Awaitable[None]]
 
-In other words: an exception handler is a function that receives an :class:`Exception` and :py:class:`Job` instance (a pyzeebe class).
+In other words: an exception handler is a function that receives an :class:`Exception`,
+:py:class:`.Job` instance and :py:class:`.JobController` (a pyzeebe class).
 
 The exception handler is called when the task has failed.
 
@@ -67,12 +68,12 @@ To add an exception handler to a task:
 
 .. code-block:: python
 
-    from pyzeebe import Job
+    from pyzeebe import Job, JobController
 
 
-    async def my_exception_handler(exception: Exception, job: Job) -> None:
+    async def my_exception_handler(exception: Exception, job: Job, job_controller: JobController) -> None:
         print(exception)
-        await job.set_failure_status(message=str(exception))
+        await job_controller.set_failure_status(job, message=str(exception))
 
 
     @worker.task(task_type="my_task", exception_handler=my_exception_handler)
@@ -81,18 +82,23 @@ To add an exception handler to a task:
 
 Now every time ``my_task`` is called (and then fails), ``my_exception_handler`` is called.
 
-*What does job.set_failure_status do?*
+*What does job_controller.set_failure_status do?*
 
 This tells Zeebe that the job failed. The job will then be retried (if configured in process definition).
+
+.. note::
+    The exception handler can also be set via :py:class:`pyzeebe.ZeebeWorker` or :py:class:`pyzeebe.ZeebeTaskRouter`.
+    Pyzeebe will try to find the exception handler in the following order:
+    ``Worker`` -> ``Router`` -> ``Task``  -> :py:func:`pyzeebe.default_exception_handler`
 
 
 Task timeout
 ------------
-When creating a task one of the parameters we can specify is ``timeout``.
+When creating a task one of the parameters we can specify is ``timeout_ms``.
 
 .. code-block:: python
 
-    @worker.task(task_type="my_task", timeout=20000)
+    @worker.task(task_type="my_task", timeout_ms=20000)
     def my_task(input: str):
         return {"output": f"Hello World, {input}!"}
 
@@ -148,9 +154,3 @@ Example:
     async def my_task(job: Job):
         print(job.process_instance_key)
         return {**job.custom_headers}
-
-.. note::
-
-    Do not set the status for the job (set_success_status, set_failure_status or set_error_status) inside the task. 
-    This will cause pyzeebe to raise an :py:class:`pyzeebe.errors.ActivateJobsRequestInvalidError`.
-

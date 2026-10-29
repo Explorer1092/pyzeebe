@@ -6,16 +6,14 @@ logger = logging.getLogger(__name__)
 
 
 class TaskState:
-    def __init__(self):
-        self._active_jobs = list()
+    def __init__(self) -> None:
+        self._active_jobs: list[int] = []
 
     def remove(self, job: Job) -> None:
         try:
             self._active_jobs.remove(job.key)
         except ValueError:
-            logger.warning(
-                f"Could not find Job key {job.key} when trying to remove from TaskState"
-            )
+            logger.warning("Could not find Job key %s when trying to remove from TaskState", job.key)
 
     def add(self, job: Job) -> None:
         self._active_jobs.append(job.key)

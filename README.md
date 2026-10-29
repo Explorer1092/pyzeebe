@@ -1,5 +1,6 @@
 [![](https://img.shields.io/badge/Community%20Extension-An%20open%20source%20community%20maintained%20project-FF4700)](https://github.com/camunda-community-hub/community)
 [![](https://img.shields.io/badge/Lifecycle-Stable-brightgreen)](https://github.com/Camunda-Community-Hub/community/blob/main/extension-lifecycle.md#stable-)
+![Compatible with: Camunda Platform 8](https://img.shields.io/badge/Compatible%20with-Camunda%20Platform%208-0072Ce)
 
 [![Coverage Status](https://coveralls.io/repos/github/JonatanMartens/pyzeebe/badge.svg?branch=master)](https://coveralls.io/github/JonatanMartens/pyzeebe?branch=master)
 ![Test pyzeebe](https://github.com/camunda-community-hub/pyzeebe/workflows/Test%20pyzeebe/badge.svg)
@@ -9,7 +10,6 @@
 ![PyPI](https://img.shields.io/pypi/v/pyzeebe)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyzeebe)
 
-[![Documentation Status](https://readthedocs.org/projects/pyzeebe/badge/?version=latest)](https://pyzeebe.readthedocs.io/en/latest/?badge=stable)
 
 # Pyzeebe
 
@@ -19,6 +19,7 @@ Zeebe version support:
 
 | Pyzeebe version | Tested Zeebe versions  |
 | :-------------: | ---------------------- |
+|      4.x.x      | 8.5, 8.6, 8.7, 8.8     |
 |      3.x.x      | 1.0.0                  |
 |      2.x.x      | 0.23, 0.24, 0.25, 0.26 |
 |      1.x.x      | 0.23, 0.24             |
@@ -29,30 +30,30 @@ To install:
 
 `pip install pyzeebe`
 
-For full documentation please visit: https://pyzeebe.readthedocs.io/en/stable/
+For full documentation please visit: https://camunda-community-hub.github.io/pyzeebe/
 
 ## Usage
 
 ### Worker
 
-The `ZeebeWorker` class uses threading to get and run jobs.
+The `ZeebeWorker` class gets jobs from the gateway and runs them.
 
 ```python
 import asyncio
 
-from pyzeebe import ZeebeWorker, Job, create_insecure_channel
+from pyzeebe import ZeebeWorker, Job, JobController, create_insecure_channel
 
 
-channel = create_insecure_channel(hostname="localhost", port=26500) # Create grpc channel
+channel = create_insecure_channel(grpc_address="localhost:26500") # Create grpc channel
 worker = ZeebeWorker(channel) # Create a zeebe worker
 
 
-async def on_error(exception: Exception, job: Job):
+async def on_error(exception: Exception, job: Job, job_controller: JobController):
     """
     on_error will be called when the task fails
     """
     print(exception)
-    await job.set_error_status(f"Failed to handle job {job}. Error: {str(exception)}")
+    await job_controller.set_error_status(job, f"Failed to handle job {job}. Error: {str(exception)}")
 
 
 @worker.task(task_type="example", exception_handler=on_error)
@@ -80,7 +81,7 @@ await zeebe_worker.stop() # Stops worker after all running jobs have been comple
 from pyzeebe import ZeebeClient, create_insecure_channel
 
 # Create a zeebe client
-channel = create_insecure_channel(hostname="localhost", port=26500)
+channel = create_insecure_channel(grpc_address="localhost:26500")
 zeebe_client = ZeebeClient(channel)
 
 # Run a Zeebe process instance
@@ -93,7 +94,7 @@ process_instance_key, process_result = await zeebe_client.run_process_with_resul
 )
 
 # Deploy a BPMN process definition
-await zeebe_client.deploy_process("process.bpmn")
+await zeebe_client.deploy_resource("process.bpmn")
 
 # Cancel a running process
 await zeebe_client.cancel_process_instance(process_instance_key=12345)
@@ -118,16 +119,6 @@ Please make sure to update tests as appropriate.
 ## Versioning
 
 We use [SemVer](semver.org) for versioning. For the versions available, see the tags on this repository.
-
-In order to bump the current version run:
-
-```shell
-$ bump2version <part>
-```
-
-where part is the part that will be bumped (major/minor/patch/rc).
-
-This will bump the version in all relevant files as well as create a git commit.
 
 ## License
 
